@@ -73,6 +73,39 @@ defmodule NotionElixir do
   end
 
   @doc """
+  Make a patch request against the API
+
+  ## Options
+  * `:api_key` - API key to use with the request.
+  * `:api_version` - Version of the notion API
+  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
+  """
+  @spec patch(request_path :: String.t(), data :: map(), opts :: options()) :: response()
+  def patch(request_path, data, opts \\ []) do
+    opts
+    |> build_client
+    |> patch(request_path, data, opts)
+  end
+
+  @doc """
+  Make a patch request against the API using the supplied client
+
+  ## Options
+  * `:api_key` - API key to use with the request.
+  * `:api_version` - Version of the notion API
+  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
+  """
+  @spec patch(
+          client :: Tesla.Client.t(),
+          request_path :: String.t(),
+          data :: map(),
+          opts :: options()
+        ) :: response()
+  def patch(client = %Tesla.Client{}, request_path, data, _opts) do
+    Tesla.patch(client, request_path, data)
+  end
+
+  @doc """
   Build a client for re-use over requests
 
   ## Options

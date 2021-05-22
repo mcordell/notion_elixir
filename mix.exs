@@ -22,7 +22,8 @@ defmodule NotionElixir.MixProject do
   defp deps do
     [
       {:jason, "~> 1.0"},
-      {:httpoison, "~> 1.8"}
+      {:tesla, "~> 1.4"},
+      {:hackney, "~> 1.6"}
     ]
   end
 end

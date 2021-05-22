@@ -23,7 +23,8 @@ defmodule NotionElixir.MixProject do
     [
       {:jason, "~> 1.0"},
       {:tesla, "~> 1.4"},
-      {:hackney, "~> 1.6"}
+      {:hackney, "~> 1.6"},
+      {:ex_doc, "~> 0.24", only: :dev}
     ]
   end
 end

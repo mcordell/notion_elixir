@@ -18,6 +18,7 @@ defmodule NotionElixirTest do
     data = %{
       query: "Project"
     }
+
     {:ok, %{body: body}} = NotionElixir.post("/search", data)
     IO.inspect(body)
     assert Map.has_key?(body, "has_more")

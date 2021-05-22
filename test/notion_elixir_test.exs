@@ -13,4 +13,13 @@ defmodule NotionElixirTest do
     {:ok, %{body: body}} = NotionElixir.get(client, "/databases", opts)
     assert Map.has_key?(body, "has_more")
   end
+
+  test "making a POST request" do
+    data = %{
+      query: "Project"
+    }
+    {:ok, %{body: body}} = NotionElixir.post("/search", data)
+    IO.inspect(body)
+    assert Map.has_key?(body, "has_more")
+  end
 end

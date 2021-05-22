@@ -20,6 +20,15 @@ defmodule NotionElixir do
     Tesla.get(client, request_path)
   end
 
+  def post(request_path, data, opts \\ []) do
+    opts
+    |> build_client
+    |> post(request_path, data, opts)
+  end
+  def post(client = %Tesla.Client{}, request_path, data, _opts) do
+    Tesla.post(client, request_path, data)
+  end
+
   def build_client(opts \\ []) do
     opts
     |> set_api_key

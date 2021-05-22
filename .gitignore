@@ -25,3 +25,5 @@ notion_elixir-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+/config

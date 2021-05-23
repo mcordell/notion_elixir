@@ -73,6 +73,37 @@ defmodule NotionElixir do
   end
 
   @doc """
+  Make a post request against the API, and retrieve all paginated results
+
+  ## Options
+  * `:api_key` - API key to use with the request.
+  * `:api_version` - Version of the notion API
+  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
+  """
+  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) :: response()
+  def post_all(request_path, data, opts \\ []) do
+    build_client(opts)
+    |> post_all(request_path, data, opts)
+  end
+
+  @doc """
+  Make a post request against the API, and retrieve all paginated results
+
+  ## Options
+  * `:api_key` - API key to use with the request.
+  * `:api_version` - Version of the notion API
+  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
+  """
+  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) :: response()
+  def post_all(client, request_path, data, opts) do
+    post_func = fn cursor ->
+      post(client, request_path, Map.put(data, "start_cursor", cursor), opts)
+    end
+
+    post_all_results([], post(client, request_path, data, opts), post_func)
+  end
+
+  @doc """
   Make a patch request against the API
 
   ## Options
@@ -122,7 +153,7 @@ defmodule NotionElixir do
     |> configure_request_client
   end
 
-  defp configure_request_client(opts = %{api_key: key, base_url: base, api_version: version}) do
+  defp configure_request_client(%{api_key: key, base_url: base, api_version: version}) do
     middleware = [
       {Tesla.Middleware.BaseUrl, base},
       Tesla.Middleware.JSON,
@@ -156,4 +187,18 @@ defmodule NotionElixir do
   defp configured_api_version(), do: Application.get_env(:notion_elixir, :api_version)
 
   defp default_api_version(), do: @default_api_version
+
+  defp post_all_results(
+         all_results,
+         {:ok, %{body: %{"results" => results, "has_more" => true, "next_cursor" => cursor}}},
+         post_func
+       ) do
+    post_all_results(all_results ++ results, post_func.(cursor), post_func)
+  end
+
+  defp post_all_results(all_results, %{has_more: false, results: results}, _) do
+    all_results ++ results
+  end
+
+  defp post_all_results(_, error = {:error, _}, _), do: error
 end

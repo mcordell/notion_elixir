@@ -7,10 +7,11 @@ defmodule NotionElixir.Response do
   @type t :: %Response{
           body: map(),
           headers: Keyword.t(),
-          success: boolean
+          success: boolean,
+          has_more: boolean
         }
 
-  defstruct [:success, :body, :headers]
+  defstruct [:success, :body, :headers, has_more: false]
 
   @doc """
   Build a response or list response object from a raw client response.

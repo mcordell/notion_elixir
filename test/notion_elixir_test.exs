@@ -1,16 +1,17 @@
 defmodule NotionElixirTest do
   use ExUnit.Case
   doctest NotionElixir
+  alias NotionElixir.{ListResponse}
 
   test "making a get request" do
-    {:ok, %{body: body}} = NotionElixir.get("/databases")
+    %ListResponse{body: body} = NotionElixir.get("/databases")
     assert Map.has_key?(body, "has_more")
   end
 
   test "making a get request with a configured client" do
     client = NotionElixir.build_client()
     opts = %{}
-    {:ok, %{body: body}} = NotionElixir.get(client, "/databases", opts)
+    %ListResponse{body: body} = NotionElixir.get(client, "/databases", opts)
     assert Map.has_key?(body, "has_more")
   end
 
@@ -19,8 +20,7 @@ defmodule NotionElixirTest do
       query: "Project"
     }
 
-    {:ok, %{body: body}} = NotionElixir.post("/search", data)
-    IO.inspect(body)
+    %ListResponse{body: body} = NotionElixir.post("/search", data)
     assert Map.has_key?(body, "has_more")
   end
 end

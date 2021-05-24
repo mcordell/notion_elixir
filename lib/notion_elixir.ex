@@ -1,6 +1,7 @@
 defmodule NotionElixir do
   @default_base_url "https://api.notion.com/v1"
   @default_api_version "2021-05-13"
+  alias NotionElixir.{Response, ListResponse}
 
   @moduledoc """
   API Wrapper for Notion API
@@ -8,7 +9,7 @@ defmodule NotionElixir do
   """
 
   @type options :: Keyword.t()
-  @type response :: {:ok, %{}} | {:error, any()}
+  @type response :: Response.t() | ListResponse.t()
 
   @doc """
   Make a get request against the API
@@ -37,6 +38,7 @@ defmodule NotionElixir do
           response()
   def get(client = %Tesla.Client{}, request_path, _opts) do
     Tesla.get(client, request_path)
+    |> Response.build()
   end
 
   @doc """
@@ -70,6 +72,7 @@ defmodule NotionElixir do
         ) :: response()
   def post(client = %Tesla.Client{}, request_path, data, _opts) do
     Tesla.post(client, request_path, data)
+    |> Response.build()
   end
 
   @doc """
@@ -94,7 +97,7 @@ defmodule NotionElixir do
   * `:api_version` - Version of the notion API
   * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
   """
-  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) :: response()
+  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) :: ListResponse.t()
   def post_all(client, request_path, data, opts) do
     post_func = fn cursor ->
       post(client, request_path, Map.put(data, "start_cursor", cursor), opts)
@@ -134,6 +137,7 @@ defmodule NotionElixir do
         ) :: response()
   def patch(client = %Tesla.Client{}, request_path, data, _opts) do
     Tesla.patch(client, request_path, data)
+    |> Response.build()
   end
 
   @doc """
@@ -190,14 +194,18 @@ defmodule NotionElixir do
 
   defp post_all_results(
          all_results,
-         {:ok, %{body: %{"results" => results, "has_more" => true, "next_cursor" => cursor}}},
+         %{has_more: true, results: results, next_cursor: cursor},
          post_func
        ) do
     post_all_results(all_results ++ results, post_func.(cursor), post_func)
   end
 
   defp post_all_results(all_results, %{has_more: false, results: results}, _) do
-    all_results ++ results
+    %ListResponse{
+      results: all_results ++ results,
+      has_more: false,
+      body: %{}
+    }
   end
 
   defp post_all_results(_, error = {:error, _}, _), do: error

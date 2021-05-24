@@ -11,7 +11,8 @@ defmodule NotionElixir.MixProject do
       source_url: project_url(),
       homepage_url: project_url(),
       package: package(),
-      description: description()
+      description: description(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -52,4 +53,7 @@ defmodule NotionElixir.MixProject do
     An Elixir API client for the Notion API.
     """
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

@@ -1,6 +1,11 @@
 defmodule NotionElixir.ResponseCase do
   use ExUnit.CaseTemplate
 
+  def api_response_body(path) do
+    File.read!(path)
+    |> Jason.decode!()
+  end
+
   using do
     quote do
       alias NotionElixir.Response
@@ -9,14 +14,10 @@ defmodule NotionElixir.ResponseCase do
   end
 
   def successful_list_response() do
-    parsed =
-      File.read!("./test/fixtures/list_response.json")
-      |> Jason.decode!()
-
     %Tesla.Env{
       __client__: %Tesla.Client{},
       __module__: Tesla,
-      body: parsed,
+      body: api_response_body("./test/fixtures/list_response.json"),
       method: :get,
       opts: [],
       query: [],

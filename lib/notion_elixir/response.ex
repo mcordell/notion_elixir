@@ -16,8 +16,8 @@ defmodule NotionElixir.Response do
   @doc """
   Build a response or list response object from a raw client response.
   """
-  @spec build({:ok, %{body: map(), headers: Keyword.t()}}) :: Response.t() | ListResponse.t()
-  def build(raw = {:ok, %{body: body, headers: headers}}) do
+  @spec build(%{body: map(), headers: Keyword.t()}) :: Response.t() | ListResponse.t()
+  def build(raw = %{body: body, headers: headers}) do
     case body do
       %{"object" => "list"} -> ListResponse.build(raw)
       %{"has_more" => _} -> ListResponse.build(raw)

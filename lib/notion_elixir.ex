@@ -9,7 +9,7 @@ defmodule NotionElixir do
   """
 
   @type options :: Keyword.t()
-  @type response :: Response.t() | ListResponse.t()
+  @type response :: {:ok, Response.t()} | {:ok, ListResponse.t()} | {:error, any()}
 
   @doc """
   Make a get request against the API
@@ -38,7 +38,7 @@ defmodule NotionElixir do
           response()
   def get(client = %Tesla.Client{}, request_path, _opts) do
     Tesla.get(client, request_path)
-    |> Response.build()
+    |> response
   end
 
   @doc """
@@ -72,7 +72,7 @@ defmodule NotionElixir do
         ) :: response()
   def post(client = %Tesla.Client{}, request_path, data, _opts) do
     Tesla.post(client, request_path, data)
-    |> Response.build()
+    |> response
   end
 
   @doc """
@@ -137,7 +137,7 @@ defmodule NotionElixir do
         ) :: response()
   def patch(client = %Tesla.Client{}, request_path, data, _opts) do
     Tesla.patch(client, request_path, data)
-    |> Response.build()
+    |> response
   end
 
   @doc """
@@ -168,6 +168,9 @@ defmodule NotionElixir do
     Tesla.client(middleware)
   end
 
+  defp response({:ok, env}), do: {:ok, Response.build(env)}
+  defp response(err = {:error, _}), do: err
+
   defp set_api_key(opts) when is_list(opts), do: Enum.into(opts, %{}) |> set_api_key
   defp set_api_key(opts = %{api_key: _}), do: opts
   defp set_api_key(opts), do: Map.put(opts, :api_key, configured_key())
@@ -192,21 +195,21 @@ defmodule NotionElixir do
 
   defp default_api_version(), do: @default_api_version
 
+  defp post_all_results(_, err = {:error, _}, _), do: err
+
   defp post_all_results(
          all_results,
-         %{has_more: true, results: results, next_cursor: cursor},
+         {:ok, %{has_more: true, results: results, next_cursor: cursor}},
          post_func
        ) do
     post_all_results(all_results ++ results, post_func.(cursor), post_func)
   end
 
-  defp post_all_results(all_results, %{has_more: false, results: results}, _) do
+  defp post_all_results(all_results, {:ok, %{has_more: false, results: results}}, _) do
     %ListResponse{
       results: all_results ++ results,
       has_more: false,
       body: %{}
     }
   end
-
-  defp post_all_results(_, error = {:error, _}, _), do: error
 end

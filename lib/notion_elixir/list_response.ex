@@ -18,8 +18,8 @@ defmodule NotionElixir.ListResponse do
   @doc """
   Build a list response object from a raw client response.
   """
-  @spec build({:ok, %{body: map(), headers: Keyword.t()}}) :: ListResponse.t()
-  def build({:ok, %{body: body = %{"results" => results}, headers: headers}}) do
+  @spec build(%{body: map(), headers: Keyword.t()}) :: ListResponse.t()
+  def build(%{body: body = %{"results" => results}, headers: headers}) do
     %ListResponse{success: true, body: body, results: results, headers: headers}
     |> set_response_values
   end

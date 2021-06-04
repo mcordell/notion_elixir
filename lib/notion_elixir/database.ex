@@ -1,5 +1,5 @@
 defmodule NotionElixir.Database do
-  alias NotionElixir.{Response, ListResponse}
+  alias NotionElixir.{Response, ListResponse, Database}
 
   @type t :: %NotionElixir.Database{
           object: String.t(),
@@ -50,8 +50,10 @@ defmodule NotionElixir.Database do
   Get a database object by ID from the API using the provided client
   """
   @spec get(client :: Tesla.Client.t(), obj :: String.t()) :: {:ok, t()} | {:error, any()}
-  def get(client = %Tesla.Client{}, id) do
-    case NotionElixir.get(client, "/databases/" <> id) do
+  def get(client = %Tesla.Client{}, id), do: get(client, id, [])
+
+  def get(client = %Tesla.Client{}, id, opts) do
+    case NotionElixir.get(client, "/databases/" <> id, opts) do
       {:ok, response} -> {:ok, build(response)}
       err = {:error, _} -> err
     end
@@ -66,6 +68,27 @@ defmodule NotionElixir.Database do
       {:ok, response} -> {:ok, build_all(response)}
       err = {:error, _} -> err
     end
+  end
+
+  @doc """
+  Perform a query against the passed database, returning a ListResponse from the
+  API.
+
+  ## Options
+  * `:api_key` - API key to use with the request.
+  * `:api_version` - Version of the notion API
+  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
+  """
+  @spec query_all(database :: Database.t(), data :: map(), opts :: NotionElixir.options()) ::
+          ListResponse.t()
+  def query_all(database = %Database{}, data = %{}, opts = []) do
+    query_all(database.id, data, opts)
+  end
+
+  @spec query_all(database_id :: String.t(), data :: map(), opts :: NotionElixir.options()) ::
+          ListResponse.t()
+  def query_all(database_id, data = %{}, opts = []) when is_binary(database_id) do
+    NotionElixir.post_all("/databases/" <> database_id <> "/query", data, opts)
   end
 
   @doc """

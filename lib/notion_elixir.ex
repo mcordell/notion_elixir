@@ -97,7 +97,8 @@ defmodule NotionElixir do
   * `:api_version` - Version of the notion API
   * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
   """
-  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) :: ListResponse.t()
+  @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) ::
+          {:ok, ListResponse.t()} | {:error, any()}
   def post_all(client, request_path, data, opts) do
     post_func = fn cursor ->
       post(client, request_path, Map.put(data, "start_cursor", cursor), opts)
@@ -206,10 +207,6 @@ defmodule NotionElixir do
   end
 
   defp post_all_results(all_results, {:ok, %{has_more: false, results: results}}, _) do
-    %ListResponse{
-      results: all_results ++ results,
-      has_more: false,
-      body: %{}
-    }
+    {:ok, %ListResponse{results: all_results ++ results, has_more: false, body: %{}}}
   end
 end

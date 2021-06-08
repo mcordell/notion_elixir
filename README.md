@@ -13,7 +13,7 @@ Add `notion_elixir` to your list of dependencies in `mix.exs`:
 def deps do
   [
     #...
-    {:notion_elixir, "~> 0.1.0"}
+    {:notion_elixir, "~> 0.1.1"}
     #...
   ]
 end

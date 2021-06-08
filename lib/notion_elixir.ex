@@ -28,11 +28,6 @@ defmodule NotionElixir do
 
   @doc """
   Make a get request against the API using the supplied client
-
-  ## Options
-  * `:api_key` - API key to use with the request.
-  * `:api_version` - Version of the notion API
-  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
   """
   @spec get(client :: Tesla.Client.t(), request_path :: String.t(), opts :: options()) ::
           response()
@@ -58,11 +53,6 @@ defmodule NotionElixir do
 
   @doc """
   Make a post request against the API using the supplied client
-
-  ## Options
-  * `:api_key` - API key to use with the request.
-  * `:api_version` - Version of the notion API
-  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
   """
   @spec post(
           client :: Tesla.Client.t(),
@@ -91,11 +81,6 @@ defmodule NotionElixir do
 
   @doc """
   Make a post request against the API, and retrieve all paginated results
-
-  ## Options
-  * `:api_key` - API key to use with the request.
-  * `:api_version` - Version of the notion API
-  * `:base_url` - API base url, defaults to "https://api.notion.com/v1"
   """
   @spec post_all(request_path :: String.t(), data :: map(), opts :: options()) ::
           {:ok, ListResponse.t()} | {:error, any()}
